@@ -17,7 +17,7 @@ it("issue paths should match via safeParse", () => {
   const getIssues = (result: typeof z3Result | typeof z4Result) => {
     if ("issues" in result) {
       const extractIssues = (issues: typeof result.issues) =>
-        issues?.flatMap((i) => {
+        (issues as any)?.flatMap((i) => {
           if ("unionErrors" in i)
             return i.unionErrors.flatMap((unionError: ZodError) => {
               return extractIssues(unionError.issues);
@@ -34,7 +34,7 @@ it("issue paths should match via safeParse", () => {
     return [];
   };
 
-  expect(getIssues(z3Result.error).map((i) => i.path)).toEqual(
-    getIssues(z4Result.error).map((i) => i.path),
+  expect(getIssues(z3Result.error as any).map((i) => i.path)).toEqual(
+    getIssues(z4Result.error as any).map((i) => i.path),
   );
 });
