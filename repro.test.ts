@@ -2,7 +2,7 @@ import { it, expect } from "vitest";
 import { z as z3, ZodError } from "zod3";
 import { z as z4 } from "zod4";
 
-it("should work", () => {
+it("issue paths should match via safeParse", () => {
   const schema3 = z3.object({
     foo: z3.union([z3.string(), z3.number()]),
   });
@@ -10,9 +10,10 @@ it("should work", () => {
     foo: z4.union([z4.string(), z4.number()]),
   });
 
-  const z3Result = schema3["~standard"].validate({ foo: [] });
-  const z4Result = schema4["~standard"].validate({ foo: [] });
+  const z3Result = schema3.safeParse({ foo: [] });
+  const z4Result = schema4.safeParse({ foo: [] });
 
+  // Recursively get all issues
   const getIssues = (result: typeof z3Result | typeof z4Result) => {
     if ("issues" in result) {
       const extractIssues = (issues: typeof result.issues) =>
@@ -33,8 +34,7 @@ it("should work", () => {
     return [];
   };
 
-  console.log(getIssues(z4Result));
-  expect(getIssues(z3Result).map((i) => i.path)).toEqual(
-    getIssues(z4Result).map((i) => i.path),
+  expect(getIssues(z3Result.error).map((i) => i.path)).toEqual(
+    getIssues(z4Result.error).map((i) => i.path),
   );
 });
